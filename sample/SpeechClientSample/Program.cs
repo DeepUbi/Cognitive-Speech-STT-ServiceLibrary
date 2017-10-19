@@ -46,6 +46,8 @@ namespace SpeechClientSample
         /// and sends a speech recognition request using the Microsoft.Bing.Speech APIs.
         /// </summary>
         /// <param name="args">The input arguments.</param>
+        /// 
+        private static string[] sayWords = { "妈", "娜", "他", "8", "爸", "打", "慢" };
         public static void Main(string[] args)
         {
             // Validate the input arguments count.
@@ -85,9 +87,9 @@ namespace SpeechClientSample
             Console.WriteLine("--- Partial result received by OnPartialResult ---");
 
             // Print the partial response recognition hypothesis.
-            Console.WriteLine(args.DisplayText);
+            // Console.WriteLine(args.DisplayText);
 
-            Console.WriteLine();
+            // Console.WriteLine();
 
             return CompletedTask;
         }
@@ -99,25 +101,62 @@ namespace SpeechClientSample
         /// <returns>
         /// A task
         /// </returns>
+
+        private int countMatches(string str, string findStr) {
+            int lastIndex = 0;
+            int count = 0;
+            while (lastIndex != -1) {
+                lastIndex = str.IndexOf(findStr, lastIndex);
+                if (lastIndex != -1) {
+                    count++;
+                    lastIndex += findStr.Length;
+                }
+            }
+            return count;
+        }
+
+        private int countMatchesAll(string str, string[] findStrs) {
+            int count = 0;
+            foreach (string s in findStrs) {
+                count += countMatches(str, s);
+            }
+            return count;
+        }
+
         public Task OnRecognitionResult(RecognitionResult args)
         {
             var response = args;
-            Console.WriteLine();
+            // Console.WriteLine();
 
-            Console.WriteLine("--- Phrase result received by OnRecognitionResult ---");
+            // Console.WriteLine("--- Phrase result received by OnRecognitionResult ---");
 
             // Print the recognition status.
-            Console.WriteLine("***** Phrase Recognition Status = [{0}] ***", response.RecognitionStatus);
-            if (response.Phrases != null)
-            {
-                foreach (var result in response.Phrases)
-                {
-                    // Print the recognition phrase display text.
-                    Console.WriteLine("{0} (Confidence:{1})", result.DisplayText, result.Confidence);
+            // Console.WriteLine("***** Phrase Recognition Status = [{0}] ***", response.RecognitionStatus);
+            if (response.RecognitionStatus != RecognitionStatus.Success) {
+                Console.WriteLine("0");
+            } else {
+				if (response.Phrases != null)
+				{
+                    double maxConf = -1;
+                    string maxText = "";
+					foreach (var result in response.Phrases)
+					{
+                        // Print the recognition phrase display text.
+                        // Console.WriteLine("{0} (Confidence:{1})", result.DisplayText, result.Confidence);
+                        if (maxConf == -1 || (double) result.Confidence > maxConf) {
+                            maxConf = (double)result.Confidence;
+                            maxText = result.DisplayText;
+                        }
+					}
+                    int count = countMatchesAll(maxText, sayWords);
+                    Console.WriteLine(count);
+
+                } else {
+                    Console.WriteLine("0");
                 }
             }
 
-            Console.WriteLine();
+            // Console.WriteLine();
             return CompletedTask;
         }
 
