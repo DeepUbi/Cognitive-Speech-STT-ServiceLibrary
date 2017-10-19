@@ -84,7 +84,7 @@ namespace SpeechClientSample
         /// </returns>
         public Task OnPartialResult(RecognitionPartialResult args)
         {
-            Console.WriteLine("--- Partial result received by OnPartialResult ---");
+            // Console.WriteLine("--- Partial result received by OnPartialResult ---");
 
             // Print the partial response recognition hypothesis.
             // Console.WriteLine(args.DisplayText);
